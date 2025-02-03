@@ -47,7 +47,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "kinesis-rs"
+name = "kinesis"
 version = "0.1.0"
 dependencies = [
  "serialport",
