@@ -93,6 +93,26 @@ impl KinesisDevice {
 
     pub fn home(&mut self) -> Result<(), Box<dyn Error>> {
         let mut command = vec![
+            utils::MGMSG_MOT_SET_HOMEPARAMS,
+            0x04,
+            0x0E, // 14 byte data packet
+            0x00,
+            0xD0, // dest || 0x80
+            0x01,
+            0x01, // chan ident
+            0x00, // chan ident
+        ];
+        let home_dir: i16 = 0;
+        let lim_switch: i16 = 0;
+        let home_vel = vel_to_counts(10.0);
+        let offset_deg = deg_to_counts(20.0);
+        command.extend_from_slice(&home_dir.to_le_bytes());  
+        command.extend_from_slice(&lim_switch.to_le_bytes());  
+        command.extend_from_slice(&home_vel.to_le_bytes());  
+        command.extend_from_slice(&offset_deg.to_le_bytes());  
+        self.port.write_all(&command)?;   
+
+        let mut command2 = vec![
             utils::MGMSG_MOVE_HOME,
             0x04,
             self.device_id,
@@ -100,8 +120,8 @@ impl KinesisDevice {
             0x50, // dest
             0x01, // source
         ];        
-        self.port.write_all(&command)?;   
-        self.wait_home_complete()?;
+        self.port.write_all(&command2)?;   
+        // self.wait_home_complete()?;
         Ok(())
     }
 
@@ -119,7 +139,7 @@ impl KinesisDevice {
         let deg_int = deg_to_counts(deg);
         command.extend_from_slice(&deg_int.to_le_bytes());  
         self.port.write_all(&command)?; 
-        self.wait_move_complete()?;
+        // self.wait_move_complete()?;
         Ok(())
     }
 
@@ -137,7 +157,7 @@ impl KinesisDevice {
         let deg_int = deg_to_counts(deg);
         command.extend_from_slice(&deg_int.to_le_bytes());  
         self.port.write_all(&command)?; 
-        self.wait_move_complete()?;
+        // self.wait_move_complete()?;
         Ok(())
     }
 
@@ -197,7 +217,7 @@ mod tests {
         let mut device = KinesisDevice::new("/dev/ttyUSB0", 0x01);
         device.set_vel_params(0.0, 10.0, 10.0);
         thread::sleep(Duration::from_millis(50));
-        device.move_rel(10.0);
+        device.move_rel(-0.5);
         thread::sleep(Duration::from_millis(50));
         let status= device.get_status();
         println!("Device moved status: {:32x}", status);
@@ -208,7 +228,7 @@ mod tests {
         let mut device = KinesisDevice::new("/dev/ttyUSB0", 0x01);
         device.set_vel_params(0.0, 10.0, 10.0);
         thread::sleep(Duration::from_millis(50));
-        device.move_abs(10.0);
+        device.move_abs(0.0);
         thread::sleep(Duration::from_millis(50));
         let status= device.get_status();
         println!("Device moved status: {:32x}", status);

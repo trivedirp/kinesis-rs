@@ -9,6 +9,7 @@ pub const SOURCE: u8 = 0x01;
 
 /// message cocdes
 pub const MGMSG_MOVE_HOME: u8 = 0x43;
+pub const MGMSG_MOT_SET_HOMEPARAMS: u8 = 0x40;
 pub const MGMSG_MOVE_ABSOLUTE: u8 = 0x53;
 pub const MGMSG_MOVE_RELATIVE: u8 = 0x48;
 pub const MGMSG_MOVE_STOP: u8 = 0x65;
